@@ -53,7 +53,7 @@ public class MovieControllerTest {
     }
 
     /*
-    * Generate some random Movie objects
+    * Generate numItems random Movie objects
     * */
     private ArrayList<Movie> getDummyData(int numItems){
         Faker faker = new Faker();
@@ -116,4 +116,56 @@ public class MovieControllerTest {
         mockMovieRepository.deleteAll();
     }
 
+    /*
+    *   Tests that calling /movies/releaseYear/{year} returns the correct items from the repository
+    * */
+    @Test
+    public void test_movies_by_year() throws Exception {
+
+        int numDummyData = 5;
+        ArrayList<Movie> dummyData = getDummyData(numDummyData);
+
+        int year = 1965; // As we cannot guarantee the random years we will get - use one that is outside random range
+
+        Movie first = dummyData.get(2);
+        Movie second = dummyData.get(3);
+
+        first.setReleaseYear(year); // Set two of the dummies to have the desired year
+        second.setReleaseYear(year);
+
+
+        ArrayList<Movie> expectedResult = new ArrayList<>();
+        expectedResult.add(first);
+        expectedResult.add(second);
+
+        when(mockMovieRepository.findMoviesByReleaseYear(year)).thenReturn(expectedResult);
+
+
+        mockMvc.perform(get("/movies/releaseYear/"+year))
+                .andExpect(status().isOk())
+                .andExpect(content().contentType("application/json;charset=UTF-8"))
+                .andExpect(jsonPath("$", hasSize(expectedResult.size())))
+                .andExpect(jsonPath("$[0].id", is(first.getId())))
+                .andExpect(jsonPath("$[0].title", is(first.getTitle())))
+                .andExpect(jsonPath("$[0].blurb", is(first.getBlurb())))
+                .andExpect(jsonPath("$[0].releaseYear", is(first.getReleaseYear())))
+                .andExpect(jsonPath("$[0].runtime", is(first.getRuntime())))
+                .andExpect(jsonPath("$[1].id", is(second.getId())))
+                .andExpect(jsonPath("$[1].title", is(second.getTitle())))
+                .andExpect(jsonPath("$[1].blurb", is(second.getBlurb())))
+                .andExpect(jsonPath("$[1].releaseYear", is(second.getReleaseYear())))
+                .andExpect(jsonPath("$[1].runtime", is(second.getRuntime())));
+
+        //Clear the movie repo for next test
+        mockMovieRepository.deleteAll();
+    }
+
+    /*
+    *   Tests that adding a new Movie object works
+    * */
+    @Test
+    public void test_create_new_movie() throws Exception {
+
+
+    }
 }
