@@ -29,6 +29,10 @@ public class Movie {
     String blurb;
 
 
+    //Default constructor for hibernate
+    public Movie() {
+    }
+
     public Movie(String title, Date releaseDate, int runtime, String blurb) {
         this.title = title;
         this.releaseDate = releaseDate;
