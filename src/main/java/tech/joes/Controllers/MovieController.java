@@ -34,9 +34,13 @@ public class MovieController {
 
     @RequestMapping(method = RequestMethod.GET, value = "/movies/{id}")
     @ResponseBody
-    public ResponseEntity<Movie> getMovieWithId(@PathVariable Long id) {
+    public ResponseEntity<Movie> getMovieWithId(@PathVariable Integer id) {
 
         Movie movie = repository.findOne(id);
+
+        if(movie == null){
+            return new ResponseEntity<>(HttpStatus.NOT_FOUND);
+        }
 
         return new ResponseEntity<>(movie, HttpStatus.OK);
     }
