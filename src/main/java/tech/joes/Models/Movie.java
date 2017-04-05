@@ -24,6 +24,7 @@ public class Movie {
     @Column(name = "runtime", nullable = false)
     int runtime;
 
+    @Lob
     @Column(name = "blurb", nullable = false)
     String blurb;
 
