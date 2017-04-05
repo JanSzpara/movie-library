@@ -25,7 +25,7 @@ repositories {
 dependencies {
 	compile('org.springframework.boot:spring-boot-starter-web-services')
 	compile('org.springframework.boot:spring-boot-starter-data-jpa')
-	compile('com.github.javafaker:javafaker')
+	compile group: 'com.github.javafaker', name: 'javafaker', version: '0.12'
 	runtime('com.h2database:h2')
 	testCompile('org.springframework.boot:spring-boot-starter-test')
 }

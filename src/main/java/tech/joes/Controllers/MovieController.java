@@ -7,7 +7,9 @@ import org.springframework.boot.autoconfigure.EnableAutoConfiguration;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
+import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.ResponseBody;
 import tech.joes.Models.Movie;
 import tech.joes.Repositories.MovieRepository;
@@ -21,15 +23,25 @@ public class MovieController {
     @Autowired
     private MovieRepository repository;
 
-    @RequestMapping("/movies/")
+    @RequestMapping(method = RequestMethod.GET, value = "/movies/")
     @ResponseBody
     public ResponseEntity<Collection<Movie>> getAllMovies() {
 
-
         Collection<Movie> movies = (Collection<Movie>) repository.findAll();
-
 
         return new ResponseEntity<>(movies, HttpStatus.OK);
     }
+
+    @RequestMapping(method = RequestMethod.GET, value = "/movies/{id}")
+    @ResponseBody
+    public ResponseEntity<Movie> getMovieWithId(@PathVariable Long id) {
+
+        Movie movie = repository.findOne(id);
+
+        return new ResponseEntity<>(movie, HttpStatus.OK);
+    }
+
+
+
 
 }

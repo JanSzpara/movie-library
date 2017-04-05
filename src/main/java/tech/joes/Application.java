@@ -1,5 +1,6 @@
 package tech.joes;
 
+import com.github.javafaker.Faker;
 import org.springframework.boot.CommandLineRunner;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
@@ -8,6 +9,7 @@ import tech.joes.Models.Movie;
 import tech.joes.Repositories.MovieRepository;
 
 import java.util.Date;
+import java.util.concurrent.TimeUnit;
 
 /**
  * Created by joe on 05/04/2017.
@@ -15,7 +17,7 @@ import java.util.Date;
 @SpringBootApplication
 public class Application {
 
-
+    Faker faker = new Faker();
 
     public static void main(String[] args) {
         SpringApplication.run(Application.class, args);
@@ -27,7 +29,8 @@ public class Application {
             repository.deleteAll();
             //Create and insert some Movies with fake data
             for(int i = 0; i < 20; i++) {
-                repository.save(new Movie("Test", new Date(), 23223,"Lorem Ipsum"));
+
+                repository.save(new Movie(faker.lorem().word(), faker.date().past(10, TimeUnit.DAYS), faker.number().numberBetween(1,9999),faker.lorem().paragraph()));
             }
         };
     }
