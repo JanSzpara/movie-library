@@ -6,17 +6,13 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.autoconfigure.EnableAutoConfiguration;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.stereotype.Controller;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestMethod;
-import org.springframework.web.bind.annotation.ResponseBody;
+import org.springframework.web.bind.annotation.*;
 import tech.joes.Models.Movie;
 import tech.joes.Repositories.MovieRepository;
 
 import java.util.Collection;
 
-@Controller
+@RestController
 @EnableAutoConfiguration
 public class MovieController {
 
@@ -46,6 +42,14 @@ public class MovieController {
     }
 
 
+    @RequestMapping(method = RequestMethod.POST, value = "/movies/")
+    @ResponseBody
+
+    public ResponseEntity addMovie(@RequestBody Movie input){
+
+        return new ResponseEntity<>(repository.save(input), HttpStatus.CREATED);
+
+    }
 
 
 }

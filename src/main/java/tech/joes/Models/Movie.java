@@ -18,9 +18,8 @@ public class Movie {
     @Column(name = "title", nullable = false)
     String title;
 
-    @Temporal(TemporalType.TIMESTAMP)
     @Column(name = "release_date", nullable = false)
-    Date releaseDate;
+    int releaseYear;
 
     @Column(name = "runtime", nullable = false)
     int runtime;
@@ -33,9 +32,9 @@ public class Movie {
     public Movie() {
     }
 
-    public Movie(String title, Date releaseDate, int runtime, String blurb) {
+    public Movie(String title, int releaseYear, int runtime, String blurb) {
         this.title = title;
-        this.releaseDate = releaseDate;
+        this.releaseYear = releaseYear;
         this.runtime = runtime;
         this.blurb = blurb;
     }
@@ -52,12 +51,12 @@ public class Movie {
         this.title = title;
     }
 
-    public Date getReleaseDate() {
-        return releaseDate;
+    public int getReleaseYear() {
+        return releaseYear;
     }
 
-    public void setReleaseDate(Date releaseDate) {
-        this.releaseDate = releaseDate;
+    public void setReleaseYear(int releaseYear) {
+        this.releaseYear = releaseYear;
     }
 
     public int getRuntime() {
