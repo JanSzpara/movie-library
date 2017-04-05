@@ -11,6 +11,7 @@ import tech.joes.Models.Movie;
 import tech.joes.Repositories.MovieRepository;
 
 import java.util.Collection;
+import java.util.List;
 
 @RestController
 @EnableAutoConfiguration
@@ -34,22 +35,64 @@ public class MovieController {
 
         Movie movie = repository.findOne(id);
 
-        if(movie == null){
+        if (movie == null) {
             return new ResponseEntity<>(HttpStatus.NOT_FOUND);
         }
 
         return new ResponseEntity<>(movie, HttpStatus.OK);
     }
 
-
-    @RequestMapping(method = RequestMethod.POST, value = "/movies/")
+    @RequestMapping(method = RequestMethod.GET, value = "/movies/releaseYear/{year}")
     @ResponseBody
+    public ResponseEntity<List<Movie>> getMoviesByReleaseYear(@PathVariable Integer year) {
 
-    public ResponseEntity addMovie(@RequestBody Movie input){
+        List<Movie> movies = repository.findMoviesByReleaseYear(year);
 
-        return new ResponseEntity<>(repository.save(input), HttpStatus.CREATED);
+        if (movies.size() == 0) {
+            return new ResponseEntity<>(HttpStatus.NOT_FOUND);
+        }
 
+        return new ResponseEntity<>(movies, HttpStatus.OK);
     }
 
 
+
+    @RequestMapping(method = RequestMethod.POST, value = "/movies/")
+    @ResponseBody
+    public ResponseEntity addMovie(@RequestBody Movie input) {
+        return new ResponseEntity<>(repository.save(input), HttpStatus.CREATED);
+    }
+
+    @RequestMapping(method = RequestMethod.PUT, value = "/movies/{id}")
+    @ResponseBody
+    public ResponseEntity updateMovie(@PathVariable Integer id, @RequestBody Movie input) {
+        Movie movie = repository.findOne(id);
+
+        if (movie == null) {
+            return new ResponseEntity<>(HttpStatus.NOT_FOUND);
+        }
+
+        movie.setTitle(input.getTitle());
+        movie.setBlurb(input.getBlurb());
+        movie.setReleaseYear(input.getReleaseYear());
+        movie.setRuntime(input.getRuntime());
+
+        return new ResponseEntity<>(repository.save(movie), HttpStatus.OK);
+
+    }
+
+    @RequestMapping(method = RequestMethod.DELETE, value = "/movies/{id}")
+    @ResponseBody
+    public ResponseEntity deleteMovie(@PathVariable Integer id) {
+        Movie movie = repository.findOne(id);
+
+        if (movie == null) {
+            return new ResponseEntity<>(HttpStatus.NOT_FOUND);
+        }
+
+        repository.delete(movie);
+
+        return new ResponseEntity<>(HttpStatus.NO_CONTENT);
+
+    }
 }
