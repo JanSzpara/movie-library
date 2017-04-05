@@ -3,6 +3,8 @@
   <component name="ProjectModuleManager">
     <modules>
       <module fileurl="file://$PROJECT_DIR$/movie-library.iml" filepath="$PROJECT_DIR$/movie-library.iml" />
+      <module fileurl="file://$PROJECT_DIR$/.idea/modules/movie-library_main.iml" filepath="$PROJECT_DIR$/.idea/modules/movie-library_main.iml" group="movie-library" />
+      <module fileurl="file://$PROJECT_DIR$/.idea/modules/movie-library_test.iml" filepath="$PROJECT_DIR$/.idea/modules/movie-library_test.iml" group="movie-library" />
     </modules>
   </component>
 </project>
