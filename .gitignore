@@ -19,7 +19,6 @@
 .idea/**/gradle.xml
 .idea/**/libraries
 .gradle/
-gradle/
 
 ## File-based project format:
 *.iws
