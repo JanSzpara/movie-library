@@ -2,6 +2,8 @@ package tech.joes.Controllers;
 
 
 import com.github.javafaker.Faker;
+import com.google.gson.Gson;
+import com.google.gson.GsonBuilder;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -10,6 +12,7 @@ import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.http.MediaType;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 import org.springframework.test.context.web.WebAppConfiguration;
 import org.springframework.test.web.servlet.MockMvc;
@@ -18,13 +21,14 @@ import org.springframework.web.context.WebApplicationContext;
 import tech.joes.Application;
 import tech.joes.Models.Movie;
 import tech.joes.Repositories.MovieRepository;
+import tech.joes.Serilaizers.MovieTestSerializer;
 
 import java.util.ArrayList;
 
 import static org.hamcrest.Matchers.hasSize;
 import static org.hamcrest.core.Is.is;
 import static org.mockito.Mockito.when;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
 
 @RunWith(SpringJUnit4ClassRunner.class)
@@ -43,6 +47,7 @@ public class MovieControllerTest {
 
     private MockMvc mockMvc;
 
+    private Gson gson;
     @Before
     public void setup() {
         MockitoAnnotations.initMocks(this);
@@ -50,16 +55,20 @@ public class MovieControllerTest {
                 .standaloneSetup(movieController)
                 .build();
 
+        gson = new GsonBuilder()
+                .registerTypeAdapter(Movie.class, new MovieTestSerializer())
+                .create();
+
     }
 
     /*
     * Generate numItems random Movie objects
     * */
-    private ArrayList<Movie> getDummyData(int numItems){
+    private ArrayList<Movie> getDummyData(int numItems) {
         Faker faker = new Faker();
         ArrayList<Movie> dummyData = new ArrayList<>();
-        for(int i = 0; i < numItems; i++) {
-            dummyData.add(new Movie(faker.lorem().word(), faker.number().numberBetween(1970,2017), faker.number().numberBetween(1,9999),faker.lorem().paragraph()));
+        for (int i = 0; i < numItems; i++) {
+            dummyData.add(new Movie(faker.lorem().word(), faker.number().numberBetween(1970, 2017), faker.number().numberBetween(1, 9999), faker.lorem().paragraph()));
         }
 
         return dummyData;
@@ -103,7 +112,7 @@ public class MovieControllerTest {
         when(mockMovieRepository.findOne(indexToTest)).thenReturn(expectedResult);
 
 
-        mockMvc.perform(get("/movies/"+indexToTest))
+        mockMvc.perform(get("/movies/" + indexToTest))
                 .andExpect(status().isOk())
                 .andExpect(content().contentType("application/json;charset=UTF-8"))
                 .andExpect(jsonPath("$.id", is(expectedResult.getId())))
@@ -141,7 +150,7 @@ public class MovieControllerTest {
         when(mockMovieRepository.findMoviesByReleaseYear(year)).thenReturn(expectedResult);
 
 
-        mockMvc.perform(get("/movies/releaseYear/"+year))
+        mockMvc.perform(get("/movies/releaseYear/" + year))
                 .andExpect(status().isOk())
                 .andExpect(content().contentType("application/json;charset=UTF-8"))
                 .andExpect(jsonPath("$", hasSize(expectedResult.size())))
@@ -166,6 +175,56 @@ public class MovieControllerTest {
     @Test
     public void test_create_new_movie() throws Exception {
 
+        Movie newMovie = getDummyData(1).get(0);
+        final String jsonData = gson.toJson(newMovie);
+
+        when(mockMovieRepository.save(newMovie)).thenReturn(newMovie);
+        mockMvc.perform(post("/movies/")
+                .contentType(MediaType.APPLICATION_JSON)
+                .content(jsonData))
+                .andExpect(status().isCreated());
+
+
+        //Clear the movie repo for next test
+        mockMovieRepository.deleteAll();
+    }
+
+    /*
+    *   Tests that updating the attributes of a movie works
+    * */
+    @Test
+    public void test_update_existing_movie() throws Exception {
+        int numDummyData = 5;
+        int indexToTest = 2;
+        ArrayList<Movie> dummyData = getDummyData(numDummyData);
+        Movie expectedResult = dummyData.get(indexToTest);
+
+        expectedResult.setReleaseYear(1940);
+        expectedResult.setRuntime(1234);
+        expectedResult.setBlurb("Lorem Ipsum");
+        expectedResult.setTitle("Altered title");
+
+        String jsonData = gson.toJson(dummyData.get(indexToTest));
+
+
+
+        when(mockMovieRepository.findOne(indexToTest)).thenReturn(expectedResult);
+
+
+        mockMvc.perform(put("/movies/" + indexToTest)
+                .contentType(MediaType.APPLICATION_JSON)
+                .content(jsonData))
+                .andExpect(status().isOk())
+                .andExpect(content().contentType("application/json;charset=UTF-8"))
+                .andExpect(jsonPath("$.id", is(expectedResult.getId())))
+                .andExpect(jsonPath("$.title", is(expectedResult.getTitle())))
+                .andExpect(jsonPath("$.blurb", is(expectedResult.getBlurb())))
+                .andExpect(jsonPath("$.releaseYear", is(expectedResult.getReleaseYear())))
+                .andExpect(jsonPath("$.runtime", is(expectedResult.getRuntime())));
+
+        //Clear the movie repo for next test
+        mockMovieRepository.deleteAll();
 
     }
+
 }

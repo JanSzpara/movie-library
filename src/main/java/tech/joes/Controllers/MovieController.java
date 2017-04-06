@@ -63,6 +63,9 @@ public class MovieController {
         return new ResponseEntity<>(repository.save(input), HttpStatus.CREATED);
     }
 
+    /*
+    *   Update movie with id with new values
+    * */
     @RequestMapping(method = RequestMethod.PUT, value = "/movies/{id}")
     @ResponseBody
     public ResponseEntity updateMovie(@PathVariable Integer id, @RequestBody Movie input) {
