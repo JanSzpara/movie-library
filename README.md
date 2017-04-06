@@ -1,5 +1,6 @@
 # Movie Library Rest Service
 
+Java SpringBoot RESTful service which maintains a movie library. Makes use of H2 in-memory database.
 
 # Running Service
 
@@ -60,6 +61,45 @@ The API returns movie objects with the following attributes
     "blurb": "Quae odio omnis a. Aliquam fugit quia minus accusamus ea consequuntur."
 }
  ```
+ 
+ 
+  ### `GET /movies/releaseYear/year`
+  
+  Returns an array of movies released in year `year` and status `200 OK` or a `404 Not Found` if none exist for given year
+  
+  Eg.
+  
+  ```
+  [
+    {
+      "id": 1,
+      "title": "neque",
+      "releaseYear": 1999,
+      "runtime": 2039,
+      "blurb": "Minima quidem sapiente ut. Sed ducimus dignissimos deleniti."
+    },
+    {
+      "id": 5,
+      "title": "pariatur",
+      "releaseYear": 1999,
+      "runtime": 2370,
+      "blurb": "Quae delectus corporis qui officia distinctio. Laborum sunt iusto consequuntur."
+    }
+  ]
+  ,,,
+  
+  
+  Eg.
+  ```
+ {
+     "id": 1,
+     "title": "rerum",
+     "releaseYear": 2010,
+     "runtime": 1650,
+     "blurb": "Quae odio omnis a. Aliquam fugit quia minus accusamus ea consequuntur."
+ }
+  ```
+ 
  
  
  ### `POST /movies/`
