@@ -47,7 +47,7 @@ The API returns movie objects with the following attributes
  ]
  ```
  
- ### `GET /movies/id`
+ ### `GET /movies/{id}`
  
  Returns the movie with id `id` and status `200 OK` or a `404 Not Found` if it doesn't exist
  
@@ -63,7 +63,7 @@ The API returns movie objects with the following attributes
  ```
  
  
-  ### `GET /movies/releaseYear/year`
+  ### `GET /movies/releaseYear/{year}`
   
   Returns an array of movies released in year `year` and status `200 OK` or a `404 Not Found` if none exist for given year
   
@@ -121,7 +121,7 @@ The API returns movie objects with the following attributes
  Delete the movie with id `id` and returns status `204 No Content` or a `404 Not Found` if it doesn't exist
  
 
-### `PUT /movies/id`
+### `PUT /movies/{id}`
 
  Update the movie with id `id` with new attributes. Accepts data of the form: 
  

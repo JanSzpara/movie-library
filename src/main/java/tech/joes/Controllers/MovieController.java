@@ -20,7 +20,7 @@ public class MovieController {
     @Autowired
     private MovieRepository repository;
 
-    @RequestMapping(method = RequestMethod.GET, value = "/movies/")
+    @RequestMapping(method = RequestMethod.GET, value = "/movies")
     @ResponseBody
     public ResponseEntity<Collection<Movie>> getAllMovies() {
 
@@ -57,7 +57,7 @@ public class MovieController {
 
 
 
-    @RequestMapping(method = RequestMethod.POST, value = "/movies/")
+    @RequestMapping(method = RequestMethod.POST, value = "/movies")
     @ResponseBody
     public ResponseEntity addMovie(@RequestBody Movie input) {
         return new ResponseEntity<>(repository.save(input), HttpStatus.CREATED);
