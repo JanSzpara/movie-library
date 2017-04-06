@@ -88,19 +88,7 @@ The API returns movie objects with the following attributes
   ]
  ```
   
-  
-  Eg.
-  ```
- {
-     "id": 1,
-     "title": "rerum",
-     "releaseYear": 2010,
-     "runtime": 1650,
-     "blurb": "Quae odio omnis a. Aliquam fugit quia minus accusamus ea consequuntur."
- }
-  ```
- 
- 
+
  
  ### `POST /movies/`
  
