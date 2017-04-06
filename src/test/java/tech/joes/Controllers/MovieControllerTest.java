@@ -48,6 +48,7 @@ public class MovieControllerTest {
     private MockMvc mockMvc;
 
     private Gson gson;
+
     @Before
     public void setup() {
         MockitoAnnotations.initMocks(this);
@@ -106,7 +107,7 @@ public class MovieControllerTest {
         int indexToTest = 2;
         ArrayList<Movie> dummyData = getDummyData(numDummyData);
 
-        Movie expectedResult = dummyData.get(indexToTest);
+        Movie expectedResult = dummyData.get(indexToTest -1);
 
 
         when(mockMovieRepository.findOne(indexToTest)).thenReturn(expectedResult);
@@ -197,34 +198,46 @@ public class MovieControllerTest {
         int numDummyData = 5;
         int indexToTest = 2;
         ArrayList<Movie> dummyData = getDummyData(numDummyData);
-        Movie expectedResult = dummyData.get(indexToTest);
+        Movie updatedMoved = dummyData.get(indexToTest -1);
 
-        expectedResult.setReleaseYear(1940);
-        expectedResult.setRuntime(1234);
-        expectedResult.setBlurb("Lorem Ipsum");
-        expectedResult.setTitle("Altered title");
+        updatedMoved.setReleaseYear(1940);
+        updatedMoved.setRuntime(1234);
+        updatedMoved.setBlurb("Lorem Ipsum");
+        updatedMoved.setTitle("Altered title");
 
-        String jsonData = gson.toJson(dummyData.get(indexToTest));
+        String jsonData = gson.toJson(updatedMoved);
 
 
-
-        when(mockMovieRepository.findOne(indexToTest)).thenReturn(expectedResult);
+        when(mockMovieRepository.findOne(indexToTest)).thenReturn(updatedMoved);
 
 
         mockMvc.perform(put("/movies/" + indexToTest)
                 .contentType(MediaType.APPLICATION_JSON)
                 .content(jsonData))
-                .andExpect(status().isOk())
-                .andExpect(content().contentType("application/json;charset=UTF-8"))
-                .andExpect(jsonPath("$.id", is(expectedResult.getId())))
-                .andExpect(jsonPath("$.title", is(expectedResult.getTitle())))
-                .andExpect(jsonPath("$.blurb", is(expectedResult.getBlurb())))
-                .andExpect(jsonPath("$.releaseYear", is(expectedResult.getReleaseYear())))
-                .andExpect(jsonPath("$.runtime", is(expectedResult.getRuntime())));
+                .andExpect(status().isOk());
 
         //Clear the movie repo for next test
         mockMovieRepository.deleteAll();
+    }
 
+    /*
+    *   Tests that deleting a movie works
+    * */
+    @Test
+    public void test_delete_movie() throws Exception {
+        int numDummyData = 5;
+        int indexToTest = 2;
+        ArrayList<Movie> dummyData = getDummyData(numDummyData);
+
+        when(mockMovieRepository.findOne(indexToTest)).thenReturn(dummyData.get(indexToTest - 1));
+
+
+        mockMvc.perform(delete("/movies/" + indexToTest)
+                .contentType(MediaType.APPLICATION_JSON))
+                .andExpect(status().isNoContent());
+
+        //Clear the movie repo for next test
+        mockMovieRepository.deleteAll();
     }
 
 }
