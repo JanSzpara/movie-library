@@ -104,7 +104,7 @@ The API returns movie objects with the following attributes
  }
  ```
 
-### `DELETE /movies/id`
+### `DELETE /movies/{id}`
  
  Delete the movie with id `id` and returns status `204 No Content` or a `404 Not Found` if it doesn't exist
  
