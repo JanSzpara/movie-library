@@ -1,15 +1,15 @@
-#Movie Library Rest Service
+# Movie Library Rest Service
 
 
-#Running Service
+# Running Service
 
 `./gradlew bootRun`
 
-#Testing Service
+# Testing Service
 `./gradlew test`
 
 
-#Consuming Service
+# Consuming Service
 
 The API returns movie objects with the following attributes
 
