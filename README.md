@@ -40,7 +40,7 @@ The API returns movie objects with the following attributes
    {
      "id": 21,
      "title": "Too Fast Too Furious 2",
-     "releaseYear": 0,
+     "releaseYear": 2012,
      "runtime": 45022,
      "blurb": "Et maxime nihil consequuntur omnis est."
    }
