@@ -91,4 +91,17 @@ public class MovieController {
 
         return new ResponseEntity<>(HttpStatus.NO_CONTENT);
     }
+
+    @RequestMapping(method = RequestMethod.GET, value = "/movies/runtime/between/{fromTime}/{toTime}")
+    @ResponseBody
+    public ResponseEntity<Collection<Movie>> getMoviesByRuntimeIsBetween(@PathVariable Integer fromTime, @PathVariable Integer toTime) {
+
+        List<Movie> movies = repository.findMoviesByRuntimeIsBetween(fromTime, toTime);
+
+        if (movies.size() == 0) {
+            return new ResponseEntity<>(HttpStatus.NOT_FOUND);
+        }
+
+        return new ResponseEntity<>(movies, HttpStatus.OK);
+    }
 }
