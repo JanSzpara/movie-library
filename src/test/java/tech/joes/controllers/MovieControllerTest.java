@@ -22,7 +22,6 @@ import tech.joes.models.Movie;
 import tech.joes.repositories.MovieRepository;
 import tech.joes.serilaizers.MovieTestSerializer;
 
-import java.util.Arrays;
 import java.util.List;
 
 import static org.hamcrest.Matchers.hasSize;
@@ -62,7 +61,7 @@ public class MovieControllerTest {
     }
 
     @Test
-    public void getAllMoviesEndpointReturnsAllAvailable() throws Exception {
+    public void shouldReturnAllAvaliableWhenGetAllMovies() throws Exception {
         //given
         Page<Movie> pageData = new PageImpl<>(dummyData);
         //when
@@ -75,7 +74,7 @@ public class MovieControllerTest {
     }
 
     @Test
-    public void getSingleMovieEndpointReturnsCorrectMovie() throws Exception {
+    public void shouldReturnCorrectMovieWhenGetSingleMovie() throws Exception {
         //given
         Integer indexToTest = 2;
         Movie expectedResult = dummyData.get(indexToTest - 1);
@@ -93,19 +92,12 @@ public class MovieControllerTest {
     }
 
     @Test
-    public void getMoviesByReleaseYearEndpointReturnsCorrectMovies() throws Exception {
+    public void shouldReturnCorrectMoviesWhenGetMoviesByReleaseYear() throws Exception {
         //given
-        int year = 1965; // As we cannot guarantee the random years we will get - use one that is outside random range
-
-        Movie first = dummyData.get(2);
-        Movie second = dummyData.get(3);
-        Movie third = dummyData.get(3);
-
-        first.setReleaseYear(year); // Set two of the dummies to have the desired year
-        second.setReleaseYear(year);
-        third.setReleaseYear(year + 1);
-
-        List<Movie> expectedResult = Arrays.asList(first, second, third);
+        int year = 1965;
+        List<Movie> expectedResult = dummyData;
+        Movie first = expectedResult.get(0);
+        Movie second = expectedResult.get(1);
         //when
         when(mockMovieRepository.findMoviesByReleaseYear(year)).thenReturn(expectedResult);
         //then
@@ -126,7 +118,7 @@ public class MovieControllerTest {
     }
 
     @Test
-    public void createNewMovieEndpointsCreates() throws Exception {
+    public void shouldCreateNewMovieWhenCreate() throws Exception {
         //given
         Movie newMovie = dummyData.get(0);
         final String jsonData = gson.toJson(newMovie);
@@ -140,7 +132,7 @@ public class MovieControllerTest {
     }
 
     @Test
-    public void updateExistingMovieEndpointsUpdates() throws Exception {
+    public void shouldUpdateExistingMovieWhenUpdate() throws Exception {
         //given
         Integer indexToTest = 2;
         Movie updatedMovie = dummyData.get(indexToTest - 1);
@@ -156,7 +148,7 @@ public class MovieControllerTest {
     }
 
     @Test
-    public void deleteMovieEndpointDelets() throws Exception {
+    public void shouldDeleteMovieWhenDelete() throws Exception {
         //given
         Integer indexToTest = 2;
         //when
@@ -168,7 +160,7 @@ public class MovieControllerTest {
     }
 
     @Test
-    public void getMoviesByRuntimeInBetweenReturnsCorrectMovies() throws Exception {
+    public void shouldReturnCorrectMoviesWhenGetByRuntimeInBetween() throws Exception {
         //given
         int fromTime = 1;
         int toTime = 4;
@@ -195,7 +187,7 @@ public class MovieControllerTest {
     }
 
     @Test
-    public void getMoviesByTitleOrBlurbContainingKeywordReturnsCorrectMovies() throws Exception {
+    public void shouldReturnCorrectMoviesWhenGetMoviesByTitleOrBlurbContainingKeyword() throws Exception {
         //given
         String keyword = "keyword";
         List<Movie> expectedResult = dummyData;
