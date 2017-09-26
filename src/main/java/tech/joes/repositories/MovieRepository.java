@@ -1,7 +1,7 @@
-package tech.joes.Repositories;
+package tech.joes.repositories;
 
 import org.springframework.data.elasticsearch.repository.ElasticsearchRepository;
-import tech.joes.Models.Movie;
+import tech.joes.models.Movie;
 
 import java.util.List;
 

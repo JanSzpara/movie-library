@@ -1,4 +1,4 @@
-package tech.joes.Controllers;
+package tech.joes.controllers;
 
 import com.github.javafaker.Faker;
 import com.google.gson.Gson;
@@ -18,9 +18,9 @@ import org.springframework.test.context.web.WebAppConfiguration;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.setup.MockMvcBuilders;
 import tech.joes.Application;
-import tech.joes.Models.Movie;
-import tech.joes.Repositories.MovieRepository;
-import tech.joes.Serilaizers.MovieTestSerializer;
+import tech.joes.models.Movie;
+import tech.joes.repositories.MovieRepository;
+import tech.joes.serilaizers.MovieTestSerializer;
 
 import java.util.ArrayList;
 
@@ -55,7 +55,6 @@ public class MovieControllerTest {
         gson = new GsonBuilder()
                 .registerTypeAdapter(Movie.class, new MovieTestSerializer())
                 .create();
-
     }
 
     /*
@@ -67,7 +66,6 @@ public class MovieControllerTest {
         for (int i = 0; i < numItems; i++) {
             dummyData.add(new Movie(faker.lorem().word(), faker.number().numberBetween(1970, 2017), faker.number().numberBetween(1, 9999), faker.lorem().paragraph()));
         }
-
         return dummyData;
     }
 

@@ -1,4 +1,4 @@
-package tech.joes.Config;
+package tech.joes.config;
 
 import org.elasticsearch.client.Client;
 import org.elasticsearch.client.transport.TransportClient;
@@ -14,7 +14,7 @@ import java.net.InetAddress;
 import java.net.UnknownHostException;
 
 @Configuration
-@EnableElasticsearchRepositories(basePackages = "tech.joes.Repositories")
+@EnableElasticsearchRepositories(basePackages = "tech.joes.repositories")
 public class MovieConfig {
 
     @Bean

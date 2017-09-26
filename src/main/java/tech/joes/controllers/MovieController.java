@@ -1,4 +1,4 @@
-package tech.joes.Controllers;
+package tech.joes.controllers;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.autoconfigure.EnableAutoConfiguration;
@@ -6,8 +6,8 @@ import org.springframework.data.domain.Page;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
-import tech.joes.Models.Movie;
-import tech.joes.Repositories.MovieRepository;
+import tech.joes.models.Movie;
+import tech.joes.repositories.MovieRepository;
 
 import java.util.Collection;
 import java.util.List;

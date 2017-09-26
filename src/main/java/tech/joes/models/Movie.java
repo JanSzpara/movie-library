@@ -1,8 +1,7 @@
-package tech.joes.Models;
+package tech.joes.models;
 
 import org.springframework.data.annotation.Id;
 import org.springframework.data.elasticsearch.annotations.Document;
-
 
 @Document(indexName = "library", type = "movies")
 public class Movie {
