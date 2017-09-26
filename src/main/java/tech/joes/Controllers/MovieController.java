@@ -30,7 +30,7 @@ public class MovieController {
 
     @RequestMapping(method = RequestMethod.GET, value = "/movies/{id}")
     @ResponseBody
-    public ResponseEntity<Movie> getMovieWithId(@PathVariable Integer id) {
+    public ResponseEntity<Movie> getMovieWithId(@PathVariable String id) {
 
         Movie movie = repository.findOne(id);
 
@@ -63,7 +63,7 @@ public class MovieController {
 
     @RequestMapping(method = RequestMethod.PUT, value = "/movies/{id}")
     @ResponseBody
-    public ResponseEntity updateMovie(@PathVariable Integer id, @RequestBody Movie input) {
+    public ResponseEntity updateMovie(@PathVariable String id, @RequestBody Movie input) {
         Movie movie = repository.findOne(id);
 
         if (movie == null) {
@@ -76,12 +76,11 @@ public class MovieController {
         movie.setRuntime(input.getRuntime());
 
         return new ResponseEntity<>(repository.save(movie), HttpStatus.OK);
-
     }
 
     @RequestMapping(method = RequestMethod.DELETE, value = "/movies/{id}")
     @ResponseBody
-    public ResponseEntity deleteMovie(@PathVariable Integer id) {
+    public ResponseEntity deleteMovie(@PathVariable String id) {
         Movie movie = repository.findOne(id);
 
         if (movie == null) {
@@ -91,6 +90,5 @@ public class MovieController {
         repository.delete(movie);
 
         return new ResponseEntity<>(HttpStatus.NO_CONTENT);
-
     }
 }

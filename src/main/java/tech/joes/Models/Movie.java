@@ -1,12 +1,14 @@
 package tech.joes.Models;
 
+import org.springframework.data.annotation.Id;
 import org.springframework.data.elasticsearch.annotations.Document;
 
 
 @Document(indexName = "library", type = "movies")
 public class Movie {
 
-    private int id;
+    @Id
+    private String id;
 
     private String title;
 
@@ -26,7 +28,7 @@ public class Movie {
         this.blurb = blurb;
     }
 
-    public int getId() {
+    public String getId() {
         return id;
     }
 

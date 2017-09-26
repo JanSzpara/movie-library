@@ -1,6 +1,5 @@
 package tech.joes.Controllers;
 
-
 import com.github.javafaker.Faker;
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
@@ -85,7 +84,6 @@ public class MovieControllerTest {
         Page<Movie> pageData = new PageImpl<>(dummyData);
         when(mockMovieRepository.findAll()).thenReturn(pageData);
 
-
         mockMvc.perform(get("/movies/"))
                 .andExpect(status().isOk())
                 .andExpect(content().contentType("application/json;charset=UTF-8"))
@@ -99,14 +97,12 @@ public class MovieControllerTest {
     public void test_single_movie_access_returns_correct_movie() throws Exception {
 
         int numDummyData = 5;
-        int indexToTest = 2;
+        Integer indexToTest = 2;
         ArrayList<Movie> dummyData = getDummyData(numDummyData);
 
         Movie expectedResult = dummyData.get(indexToTest - 1);
 
-
-        when(mockMovieRepository.findOne(indexToTest)).thenReturn(expectedResult);
-
+        when(mockMovieRepository.findOne(indexToTest.toString())).thenReturn(expectedResult);
 
         mockMvc.perform(get("/movies/" + indexToTest))
                 .andExpect(status().isOk())
@@ -135,13 +131,11 @@ public class MovieControllerTest {
         first.setReleaseYear(year); // Set two of the dummies to have the desired year
         second.setReleaseYear(year);
 
-
         ArrayList<Movie> expectedResult = new ArrayList<>();
         expectedResult.add(first);
         expectedResult.add(second);
 
         when(mockMovieRepository.findMoviesByReleaseYear(year)).thenReturn(expectedResult);
-
 
         mockMvc.perform(get("/movies/releaseYear/" + year))
                 .andExpect(status().isOk())
@@ -181,7 +175,7 @@ public class MovieControllerTest {
     @Test
     public void test_update_existing_movie() throws Exception {
         int numDummyData = 5;
-        int indexToTest = 2;
+        Integer indexToTest = 2;
         ArrayList<Movie> dummyData = getDummyData(numDummyData);
         Movie updatedMoved = dummyData.get(indexToTest - 1);
 
@@ -192,7 +186,7 @@ public class MovieControllerTest {
 
         String jsonData = gson.toJson(updatedMoved);
 
-        when(mockMovieRepository.findOne(indexToTest)).thenReturn(updatedMoved);
+        when(mockMovieRepository.findOne(indexToTest.toString())).thenReturn(updatedMoved);
 
         mockMvc.perform(put("/movies/" + indexToTest)
                 .contentType(MediaType.APPLICATION_JSON)
@@ -206,14 +200,13 @@ public class MovieControllerTest {
     @Test
     public void test_delete_movie() throws Exception {
         int numDummyData = 5;
-        int indexToTest = 2;
+        Integer indexToTest = 2;
         ArrayList<Movie> dummyData = getDummyData(numDummyData);
 
-        when(mockMovieRepository.findOne(indexToTest)).thenReturn(dummyData.get(indexToTest - 1));
+        when(mockMovieRepository.findOne(indexToTest.toString())).thenReturn(dummyData.get(indexToTest - 1));
 
         mockMvc.perform(delete("/movies/" + indexToTest)
                 .contentType(MediaType.APPLICATION_JSON))
                 .andExpect(status().isNoContent());
     }
-
 }
