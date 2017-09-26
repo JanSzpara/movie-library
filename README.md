@@ -1,7 +1,7 @@
 # Movie Library Rest Service
 
 Java SpringBoot RESTful service which maintains a movie library. Makes use of Elasticsearch database.
-Before running make sure to install Elasticsearch database with 2.4.0 version and set cluster name as "movie-library".
+Before running make sure to install Elasticsearch database with 2.4.0 version and set cluster name "movie-library".
 
 
 # Running Service
@@ -128,8 +128,7 @@ Note the missing id attribute
 
 ### `GET /movies/runtime/between/{fromTime}/{toTime}`
 
- Returns movies with `runtime` between fromTime and toTime: 
- Returns an array of movies with `runtime` between fromTime and toTime and status `200 OK` or a `404 Not Found` if none exist in that period
+ Returns an array of movies with `runtime` between `fromTime` and `toTime` and status `200 OK` or a `404 Not Found` if none exist in that period
  
  Eg.
   
@@ -153,10 +152,9 @@ Note the missing id attribute
  ```
  
  
- ### `GET /movies/runtime/between/{fromTime}/{toTime}`
+ ### `GET /movies/title/blurb/contains/{keyword}`
  
-  Returns movies with `runtime` between fromTime and toTime: 
-  Returns an array of movies with `runtime` between fromTime and toTime and status `200 OK` or a `404 Not Found` if none exist in that period
+  Returns an array of movies with at least one of properties `title` or `blurb` containing `keyword` and status `200 OK` or a `404 Not Found` if none exist in that period
   
   Eg.
    
@@ -174,7 +172,7 @@ Note the missing id attribute
        "title": "pariatur",
        "releaseYear": 1999,
        "runtime": 2370,
-       "blurb": "Quae delectus corporis qui officia distinctio. Laborum sunt iusto consequuntur."
+       "blurb": "Quae neque corporis qui officia distinctio. Laborum sunt iusto consequuntur."
      }
    ]
   ```
