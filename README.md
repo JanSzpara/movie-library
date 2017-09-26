@@ -1,6 +1,8 @@
 # Movie Library Rest Service
 
-Java SpringBoot RESTful service which maintains a movie library. Makes use of H2 in-memory database.
+Java SpringBoot RESTful service which maintains a movie library. Makes use of Elasticsearch database.
+Before running make sure to install Elasticsearch database with 2.4.0 version and set cluster name as "movie-library".
+
 
 # Running Service
 
