@@ -208,7 +208,6 @@ public class MovieControllerTest {
                 .andExpect(status().isNoContent());
     }
 
-
     @Test
     public void test_movies_by_runtime_in_between() throws Exception {
 
@@ -223,6 +222,33 @@ public class MovieControllerTest {
         when(mockMovieRepository.findMoviesByRuntimeIsBetween(fromTime, toTime)).thenReturn(expectedResult);
 
         mockMvc.perform(get("/movies/runtime/between/"+fromTime+"/"+toTime))
+                .andExpect(status().isOk())
+                .andExpect(content().contentType("application/json;charset=UTF-8"))
+                .andExpect(jsonPath("$", hasSize(expectedResult.size())))
+                .andExpect(jsonPath("$[0].id", is(first.getId())))
+                .andExpect(jsonPath("$[0].title", is(first.getTitle())))
+                .andExpect(jsonPath("$[0].blurb", is(first.getBlurb())))
+                .andExpect(jsonPath("$[0].releaseYear", is(first.getReleaseYear())))
+                .andExpect(jsonPath("$[0].runtime", is(first.getRuntime())))
+                .andExpect(jsonPath("$[1].id", is(second.getId())))
+                .andExpect(jsonPath("$[1].title", is(second.getTitle())))
+                .andExpect(jsonPath("$[1].blurb", is(second.getBlurb())))
+                .andExpect(jsonPath("$[1].releaseYear", is(second.getReleaseYear())))
+                .andExpect(jsonPath("$[1].runtime", is(second.getRuntime())));
+    }
+
+    @Test
+    public void test_movies_by_title_or_keyword_containg() throws Exception {
+        int numDummyData = 3;
+
+        String keyword = "keyword";
+        ArrayList<Movie> expectedResult = getDummyData(numDummyData);
+        Movie first =expectedResult.get(0);
+        Movie second = expectedResult.get(1);
+
+        when(mockMovieRepository.findMoviesByTitleContainingOrBlurbContaining(keyword, keyword)).thenReturn(expectedResult);
+
+        mockMvc.perform(get("/movies/title/blurb/contains/"+keyword))
                 .andExpect(status().isOk())
                 .andExpect(content().contentType("application/json;charset=UTF-8"))
                 .andExpect(jsonPath("$", hasSize(expectedResult.size())))

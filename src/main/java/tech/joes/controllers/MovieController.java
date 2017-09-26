@@ -104,4 +104,17 @@ public class MovieController {
 
         return new ResponseEntity<>(movies, HttpStatus.OK);
     }
+
+    @RequestMapping(method = RequestMethod.GET, value = "/movies/title/blurb/contains/{keyword}")
+    @ResponseBody
+    public ResponseEntity<Collection<Movie>> getMoviesByTitleContainingOrBlurbContaining(@PathVariable String keyword) {
+
+        List<Movie> movies = repository.findMoviesByTitleContainingOrBlurbContaining(keyword, keyword);
+
+        if (movies.size() == 0) {
+            return new ResponseEntity<>(HttpStatus.NOT_FOUND);
+        }
+
+        return new ResponseEntity<>(movies, HttpStatus.OK);
+    }
 }
