@@ -1,6 +1,5 @@
 package tech.joes.controllers;
 
-import com.github.javafaker.Faker;
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 import org.junit.Before;
@@ -18,11 +17,13 @@ import org.springframework.test.context.web.WebAppConfiguration;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.setup.MockMvcBuilders;
 import tech.joes.Application;
+import tech.joes.generators.MovieFakeDataGenerator;
 import tech.joes.models.Movie;
 import tech.joes.repositories.MovieRepository;
 import tech.joes.serilaizers.MovieTestSerializer;
 
-import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.List;
 
 import static org.hamcrest.Matchers.hasSize;
 import static org.hamcrest.core.Is.is;
@@ -35,6 +36,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 @WebAppConfiguration
 public class MovieControllerTest {
 
+    private final static int DUMMY_DATA_SIZE = 5;
     @Mock
     private MovieRepository mockMovieRepository;
 
@@ -44,6 +46,8 @@ public class MovieControllerTest {
     private MockMvc mockMvc;
 
     private Gson gson;
+
+    private final static List<Movie> dummyData = MovieFakeDataGenerator.getDummyData(DUMMY_DATA_SIZE);
 
     @Before
     public void setup() {
@@ -57,51 +61,27 @@ public class MovieControllerTest {
                 .create();
     }
 
-    /*
-    * Generate numItems random Movie objects
-    * */
-    private ArrayList<Movie> getDummyData(int numItems) {
-        Faker faker = new Faker();
-        ArrayList<Movie> dummyData = new ArrayList<>();
-        for (int i = 0; i < numItems; i++) {
-            dummyData.add(new Movie(faker.lorem().word(), faker.number().numberBetween(1970, 2017), faker.number().numberBetween(1, 9999), faker.lorem().paragraph()));
-        }
-        return dummyData;
-    }
-
-
-    /*
-    *   Tests that calling /movies/ returns all available movies in the repository
-    * */
     @Test
-    public void test_movies_endpoint_returns_all_available() throws Exception {
-
-        int numDummyData = 5;
-
-        ArrayList<Movie> dummyData = getDummyData(numDummyData);
+    public void getAllMoviesEndpointReturnsAllAvailable() throws Exception {
+        //given
         Page<Movie> pageData = new PageImpl<>(dummyData);
+        //when
         when(mockMovieRepository.findAll()).thenReturn(pageData);
-
+        //then
         mockMvc.perform(get("/movies/"))
                 .andExpect(status().isOk())
                 .andExpect(content().contentType("application/json;charset=UTF-8"))
-                .andExpect(jsonPath("$", hasSize(numDummyData)));
+                .andExpect(jsonPath("$", hasSize(dummyData.size())));
     }
 
-    /*
-    *   Tests that calling /movies/{id} returns the correct item from the repository
-    * */
     @Test
-    public void test_single_movie_access_returns_correct_movie() throws Exception {
-
-        int numDummyData = 5;
+    public void getSingleMovieEndpointReturnsCorrectMovie() throws Exception {
+        //given
         Integer indexToTest = 2;
-        ArrayList<Movie> dummyData = getDummyData(numDummyData);
-
         Movie expectedResult = dummyData.get(indexToTest - 1);
-
+        //when
         when(mockMovieRepository.findOne(indexToTest.toString())).thenReturn(expectedResult);
-
+        //then
         mockMvc.perform(get("/movies/" + indexToTest))
                 .andExpect(status().isOk())
                 .andExpect(content().contentType("application/json;charset=UTF-8"))
@@ -112,29 +92,23 @@ public class MovieControllerTest {
                 .andExpect(jsonPath("$.runtime", is(expectedResult.getRuntime())));
     }
 
-    /*
-    *   Tests that calling /movies/releaseYear/{year} returns the correct items from the repository
-    * */
     @Test
-    public void test_movies_by_year() throws Exception {
-
-        int numDummyData = 5;
-        ArrayList<Movie> dummyData = getDummyData(numDummyData);
-
+    public void getMoviesByReleaseYearEndpointReturnsCorrectMovies() throws Exception {
+        //given
         int year = 1965; // As we cannot guarantee the random years we will get - use one that is outside random range
 
         Movie first = dummyData.get(2);
         Movie second = dummyData.get(3);
+        Movie third = dummyData.get(3);
 
         first.setReleaseYear(year); // Set two of the dummies to have the desired year
         second.setReleaseYear(year);
+        third.setReleaseYear(year + 1);
 
-        ArrayList<Movie> expectedResult = new ArrayList<>();
-        expectedResult.add(first);
-        expectedResult.add(second);
-
+        List<Movie> expectedResult = Arrays.asList(first, second, third);
+        //when
         when(mockMovieRepository.findMoviesByReleaseYear(year)).thenReturn(expectedResult);
-
+        //then
         mockMvc.perform(get("/movies/releaseYear/" + year))
                 .andExpect(status().isOk())
                 .andExpect(content().contentType("application/json;charset=UTF-8"))
@@ -151,77 +125,60 @@ public class MovieControllerTest {
                 .andExpect(jsonPath("$[1].runtime", is(second.getRuntime())));
     }
 
-    /*
-    *   Tests that adding a new Movie object works
-    * */
     @Test
-    public void test_create_new_movie() throws Exception {
-
-        Movie newMovie = getDummyData(1).get(0);
+    public void createNewMovieEndpointsCreates() throws Exception {
+        //given
+        Movie newMovie = dummyData.get(0);
         final String jsonData = gson.toJson(newMovie);
-
+        //when
         when(mockMovieRepository.save(newMovie)).thenReturn(newMovie);
+        //then
         mockMvc.perform(post("/movies/")
                 .contentType(MediaType.APPLICATION_JSON)
                 .content(jsonData))
                 .andExpect(status().isCreated());
     }
 
-    /*
-    *   Tests that updating the attributes of a movie works
-    * */
     @Test
-    public void test_update_existing_movie() throws Exception {
-        int numDummyData = 5;
+    public void updateExistingMovieEndpointsUpdates() throws Exception {
+        //given
         Integer indexToTest = 2;
-        ArrayList<Movie> dummyData = getDummyData(numDummyData);
-        Movie updatedMoved = dummyData.get(indexToTest - 1);
-
-        updatedMoved.setReleaseYear(1940);
-        updatedMoved.setRuntime(1234);
-        updatedMoved.setBlurb("Lorem Ipsum");
-        updatedMoved.setTitle("Altered title");
-
-        String jsonData = gson.toJson(updatedMoved);
-
-        when(mockMovieRepository.findOne(indexToTest.toString())).thenReturn(updatedMoved);
-
+        Movie updatedMovie = dummyData.get(indexToTest - 1);
+        String jsonData = gson.toJson(updatedMovie);
+        //when
+        when(mockMovieRepository.findOne(indexToTest.toString())).thenReturn(updatedMovie);
+        when(mockMovieRepository.save(updatedMovie)).thenReturn(updatedMovie);
+        //then
         mockMvc.perform(put("/movies/" + indexToTest)
                 .contentType(MediaType.APPLICATION_JSON)
                 .content(jsonData))
                 .andExpect(status().isOk());
     }
 
-    /*
-    *   Tests that deleting a movie works
-    * */
     @Test
-    public void test_delete_movie() throws Exception {
-        int numDummyData = 5;
+    public void deleteMovieEndpointDelets() throws Exception {
+        //given
         Integer indexToTest = 2;
-        ArrayList<Movie> dummyData = getDummyData(numDummyData);
-
+        //when
         when(mockMovieRepository.findOne(indexToTest.toString())).thenReturn(dummyData.get(indexToTest - 1));
-
+        //then
         mockMvc.perform(delete("/movies/" + indexToTest)
                 .contentType(MediaType.APPLICATION_JSON))
                 .andExpect(status().isNoContent());
     }
 
     @Test
-    public void test_movies_by_runtime_in_between() throws Exception {
-
-        int numDummyData = 3;
+    public void getMoviesByRuntimeInBetweenReturnsCorrectMovies() throws Exception {
+        //given
         int fromTime = 1;
         int toTime = 4;
-
-        ArrayList<Movie> expectedResult = getDummyData(numDummyData);
-        Movie first =expectedResult.get(0);
+        List<Movie> expectedResult = dummyData;
+        Movie first = expectedResult.get(0);
         Movie second = expectedResult.get(1);
-
+        //when
         when(mockMovieRepository.findMoviesByRuntimeIsBetween(fromTime, toTime)).thenReturn(expectedResult);
-
-        mockMvc.perform(get("/movies/runtime/between/"+fromTime+"/"+toTime))
+        //then
+        mockMvc.perform(get("/movies/runtime/between/" + fromTime + "/" + toTime))
                 .andExpect(status().isOk())
                 .andExpect(content().contentType("application/json;charset=UTF-8"))
                 .andExpect(jsonPath("$", hasSize(expectedResult.size())))
@@ -238,17 +195,16 @@ public class MovieControllerTest {
     }
 
     @Test
-    public void test_movies_by_title_or_keyword_containg() throws Exception {
-        int numDummyData = 3;
-
+    public void getMoviesByTitleOrBlurbContainingKeywordReturnsCorrectMovies() throws Exception {
+        //given
         String keyword = "keyword";
-        ArrayList<Movie> expectedResult = getDummyData(numDummyData);
-        Movie first =expectedResult.get(0);
+        List<Movie> expectedResult = dummyData;
+        Movie first = expectedResult.get(0);
         Movie second = expectedResult.get(1);
-
+        //when
         when(mockMovieRepository.findMoviesByTitleContainingOrBlurbContaining(keyword, keyword)).thenReturn(expectedResult);
-
-        mockMvc.perform(get("/movies/title/blurb/contains/"+keyword))
+        //then
+        mockMvc.perform(get("/movies/title/blurb/contains/" + keyword))
                 .andExpect(status().isOk())
                 .andExpect(content().contentType("application/json;charset=UTF-8"))
                 .andExpect(jsonPath("$", hasSize(expectedResult.size())))
