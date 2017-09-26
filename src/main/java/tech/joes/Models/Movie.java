@@ -1,36 +1,22 @@
 package tech.joes.Models;
 
-import javax.persistence.*;
-import java.util.Date;
+import org.springframework.data.elasticsearch.annotations.Document;
 
-/**
- * Created by joe on 05/04/2017.
- */
 
-@Entity
-@Table(name = "movies")
+@Document(indexName = "library", type = "movies")
 public class Movie {
 
-    @Id
-    @GeneratedValue(strategy = GenerationType.AUTO)
-    int id;
+    private int id;
 
-    @Column(name = "title", nullable = false)
-    String title;
+    private String title;
 
-    @Column(name = "release_date", nullable = false)
-    int releaseYear;
+    private int releaseYear;
 
-    @Column(name = "runtime", nullable = false)
-    int runtime;
+    private int runtime;
 
-    @Lob
-    @Column(name = "blurb", nullable = false)
-    String blurb;
+    private String blurb;
 
-
-    //Default constructor for hibernate
-    public Movie() {
+    public Movie(){
     }
 
     public Movie(String title, int releaseYear, int runtime, String blurb) {

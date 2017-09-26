@@ -1,9 +1,8 @@
-package tech.joes.Controllers; /**
- * Created by joe on 05/04/2017.
- */
+package tech.joes.Controllers;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.autoconfigure.EnableAutoConfiguration;
+import org.springframework.data.domain.Page;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -24,9 +23,9 @@ public class MovieController {
     @ResponseBody
     public ResponseEntity<Collection<Movie>> getAllMovies() {
 
-        Collection<Movie> movies = (Collection<Movie>) repository.findAll();
+        Page<Movie> movies = (Page<Movie>) repository.findAll();
 
-        return new ResponseEntity<>(movies, HttpStatus.OK);
+        return new ResponseEntity<>(movies.getContent(), HttpStatus.OK);
     }
 
     @RequestMapping(method = RequestMethod.GET, value = "/movies/{id}")
@@ -56,16 +55,12 @@ public class MovieController {
     }
 
 
-
     @RequestMapping(method = RequestMethod.POST, value = "/movies")
     @ResponseBody
     public ResponseEntity addMovie(@RequestBody Movie input) {
         return new ResponseEntity<>(repository.save(input), HttpStatus.CREATED);
     }
 
-    /*
-    *   Update movie with id with new values
-    * */
     @RequestMapping(method = RequestMethod.PUT, value = "/movies/{id}")
     @ResponseBody
     public ResponseEntity updateMovie(@PathVariable Integer id, @RequestBody Movie input) {
