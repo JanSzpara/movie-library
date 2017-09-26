@@ -10,14 +10,14 @@ import org.junit.runner.RunWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageImpl;
 import org.springframework.http.MediaType;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 import org.springframework.test.context.web.WebAppConfiguration;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.setup.MockMvcBuilders;
-import org.springframework.web.context.WebApplicationContext;
 import tech.joes.Application;
 import tech.joes.Models.Movie;
 import tech.joes.Repositories.MovieRepository;
@@ -36,11 +36,8 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 @WebAppConfiguration
 public class MovieControllerTest {
 
-    @Autowired
-    private WebApplicationContext webApplicationContext;
-
     @Mock
-    MovieRepository mockMovieRepository;
+    private MovieRepository mockMovieRepository;
 
     @InjectMocks
     private MovieController movieController;
@@ -85,16 +82,14 @@ public class MovieControllerTest {
         int numDummyData = 5;
 
         ArrayList<Movie> dummyData = getDummyData(numDummyData);
-        when(mockMovieRepository.findAll()).thenReturn(dummyData);
+        Page<Movie> pageData = new PageImpl<>(dummyData);
+        when(mockMovieRepository.findAll()).thenReturn(pageData);
 
 
         mockMvc.perform(get("/movies/"))
                 .andExpect(status().isOk())
                 .andExpect(content().contentType("application/json;charset=UTF-8"))
                 .andExpect(jsonPath("$", hasSize(numDummyData)));
-
-        //Clear the movie repo for next test
-        mockMovieRepository.deleteAll();
     }
 
     /*
@@ -107,7 +102,7 @@ public class MovieControllerTest {
         int indexToTest = 2;
         ArrayList<Movie> dummyData = getDummyData(numDummyData);
 
-        Movie expectedResult = dummyData.get(indexToTest -1);
+        Movie expectedResult = dummyData.get(indexToTest - 1);
 
 
         when(mockMovieRepository.findOne(indexToTest)).thenReturn(expectedResult);
@@ -121,9 +116,6 @@ public class MovieControllerTest {
                 .andExpect(jsonPath("$.blurb", is(expectedResult.getBlurb())))
                 .andExpect(jsonPath("$.releaseYear", is(expectedResult.getReleaseYear())))
                 .andExpect(jsonPath("$.runtime", is(expectedResult.getRuntime())));
-
-        //Clear the movie repo for next test
-        mockMovieRepository.deleteAll();
     }
 
     /*
@@ -165,9 +157,6 @@ public class MovieControllerTest {
                 .andExpect(jsonPath("$[1].blurb", is(second.getBlurb())))
                 .andExpect(jsonPath("$[1].releaseYear", is(second.getReleaseYear())))
                 .andExpect(jsonPath("$[1].runtime", is(second.getRuntime())));
-
-        //Clear the movie repo for next test
-        mockMovieRepository.deleteAll();
     }
 
     /*
@@ -184,10 +173,6 @@ public class MovieControllerTest {
                 .contentType(MediaType.APPLICATION_JSON)
                 .content(jsonData))
                 .andExpect(status().isCreated());
-
-
-        //Clear the movie repo for next test
-        mockMovieRepository.deleteAll();
     }
 
     /*
@@ -198,7 +183,7 @@ public class MovieControllerTest {
         int numDummyData = 5;
         int indexToTest = 2;
         ArrayList<Movie> dummyData = getDummyData(numDummyData);
-        Movie updatedMoved = dummyData.get(indexToTest -1);
+        Movie updatedMoved = dummyData.get(indexToTest - 1);
 
         updatedMoved.setReleaseYear(1940);
         updatedMoved.setRuntime(1234);
@@ -207,17 +192,12 @@ public class MovieControllerTest {
 
         String jsonData = gson.toJson(updatedMoved);
 
-
         when(mockMovieRepository.findOne(indexToTest)).thenReturn(updatedMoved);
-
 
         mockMvc.perform(put("/movies/" + indexToTest)
                 .contentType(MediaType.APPLICATION_JSON)
                 .content(jsonData))
                 .andExpect(status().isOk());
-
-        //Clear the movie repo for next test
-        mockMovieRepository.deleteAll();
     }
 
     /*
@@ -231,13 +211,9 @@ public class MovieControllerTest {
 
         when(mockMovieRepository.findOne(indexToTest)).thenReturn(dummyData.get(indexToTest - 1));
 
-
         mockMvc.perform(delete("/movies/" + indexToTest)
                 .contentType(MediaType.APPLICATION_JSON))
                 .andExpect(status().isNoContent());
-
-        //Clear the movie repo for next test
-        mockMovieRepository.deleteAll();
     }
 
 }
