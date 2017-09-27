@@ -9,8 +9,6 @@ import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
 import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.data.domain.Page;
-import org.springframework.data.domain.PageImpl;
 import org.springframework.http.MediaType;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 import org.springframework.test.context.web.WebAppConfiguration;
@@ -21,11 +19,15 @@ import tech.joes.generators.MovieFakeDataGenerator;
 import tech.joes.models.Movie;
 import tech.joes.repositories.MovieRepository;
 import tech.joes.serilaizers.MovieTestSerializer;
+import tech.joes.services.MovieService;
 
 import java.util.List;
+import java.util.Optional;
 
 import static org.hamcrest.Matchers.hasSize;
 import static org.hamcrest.core.Is.is;
+import static org.mockito.Matchers.any;
+import static org.mockito.Matchers.anyString;
 import static org.mockito.Mockito.when;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
@@ -38,6 +40,8 @@ public class MovieControllerTest {
     private final static int DUMMY_DATA_SIZE = 5;
     @Mock
     private MovieRepository mockMovieRepository;
+    @Mock
+    private MovieService mockMovieService;
 
     @InjectMocks
     private MovieController movieController;
@@ -63,9 +67,9 @@ public class MovieControllerTest {
     @Test
     public void shouldReturnAllAvaliableWhenGetAllMovies() throws Exception {
         //given
-        Page<Movie> pageData = new PageImpl<>(dummyData);
+        List<Movie> data = dummyData;
         //when
-        when(mockMovieRepository.findAll()).thenReturn(pageData);
+        when(mockMovieService.getAllMovies()).thenReturn(data);
         //then
         mockMvc.perform(get("/movies/"))
                 .andExpect(status().isOk())
@@ -77,18 +81,18 @@ public class MovieControllerTest {
     public void shouldReturnCorrectMovieWhenGetSingleMovie() throws Exception {
         //given
         Integer indexToTest = 2;
-        Movie expectedResult = dummyData.get(indexToTest - 1);
+        Optional<Movie> expectedResult = Optional.of(dummyData.get(indexToTest - 1));
         //when
-        when(mockMovieRepository.findOne(indexToTest.toString())).thenReturn(expectedResult);
+        when(mockMovieService.getMovieWithId(indexToTest.toString())).thenReturn(expectedResult);
         //then
         mockMvc.perform(get("/movies/" + indexToTest))
                 .andExpect(status().isOk())
                 .andExpect(content().contentType("application/json;charset=UTF-8"))
-                .andExpect(jsonPath("$.id", is(expectedResult.getId())))
-                .andExpect(jsonPath("$.title", is(expectedResult.getTitle())))
-                .andExpect(jsonPath("$.blurb", is(expectedResult.getBlurb())))
-                .andExpect(jsonPath("$.releaseYear", is(expectedResult.getReleaseYear())))
-                .andExpect(jsonPath("$.runtime", is(expectedResult.getRuntime())));
+                .andExpect(jsonPath("$.id", is(expectedResult.get().getId())))
+                .andExpect(jsonPath("$.title", is(expectedResult.get().getTitle())))
+                .andExpect(jsonPath("$.blurb", is(expectedResult.get().getBlurb())))
+                .andExpect(jsonPath("$.releaseYear", is(expectedResult.get().getReleaseYear())))
+                .andExpect(jsonPath("$.runtime", is(expectedResult.get().getRuntime())));
     }
 
     @Test
@@ -99,7 +103,7 @@ public class MovieControllerTest {
         Movie first = expectedResult.get(0);
         Movie second = expectedResult.get(1);
         //when
-        when(mockMovieRepository.findMoviesByReleaseYear(year)).thenReturn(expectedResult);
+        when(mockMovieService.getMoviesByReleaseYear(year)).thenReturn(expectedResult);
         //then
         mockMvc.perform(get("/movies/releaseYear/" + year))
                 .andExpect(status().isOk())
@@ -138,8 +142,7 @@ public class MovieControllerTest {
         Movie updatedMovie = dummyData.get(indexToTest - 1);
         String jsonData = gson.toJson(updatedMovie);
         //when
-        when(mockMovieRepository.findOne(indexToTest.toString())).thenReturn(updatedMovie);
-        when(mockMovieRepository.save(updatedMovie)).thenReturn(updatedMovie);
+        when(mockMovieService.updateMovie(anyString(), any(Movie.class))).thenReturn(Optional.of(updatedMovie));
         //then
         mockMvc.perform(put("/movies/" + indexToTest)
                 .contentType(MediaType.APPLICATION_JSON)
@@ -152,7 +155,7 @@ public class MovieControllerTest {
         //given
         Integer indexToTest = 2;
         //when
-        when(mockMovieRepository.findOne(indexToTest.toString())).thenReturn(dummyData.get(indexToTest - 1));
+        when(mockMovieService.deleteMovie(indexToTest.toString())).thenReturn(true);
         //then
         mockMvc.perform(delete("/movies/" + indexToTest)
                 .contentType(MediaType.APPLICATION_JSON))
@@ -168,7 +171,7 @@ public class MovieControllerTest {
         Movie first = expectedResult.get(0);
         Movie second = expectedResult.get(1);
         //when
-        when(mockMovieRepository.findMoviesByRuntimeIsBetween(fromTime, toTime)).thenReturn(expectedResult);
+        when(mockMovieService.getMoviesByRuntimeIsBetween(fromTime, toTime)).thenReturn(expectedResult);
         //then
         mockMvc.perform(get("/movies/runtime/between/" + fromTime + "/" + toTime))
                 .andExpect(status().isOk())
@@ -194,7 +197,7 @@ public class MovieControllerTest {
         Movie first = expectedResult.get(0);
         Movie second = expectedResult.get(1);
         //when
-        when(mockMovieRepository.findMoviesByTitleContainingOrBlurbContaining(keyword, keyword)).thenReturn(expectedResult);
+        when(mockMovieService.getMoviesByTitleContainingOrBlurbContaining(keyword)).thenReturn(expectedResult);
         //then
         mockMvc.perform(get("/movies/title/blurb/contains/" + keyword))
                 .andExpect(status().isOk())

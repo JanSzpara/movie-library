@@ -2,92 +2,73 @@ package tech.joes.controllers;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.autoconfigure.EnableAutoConfiguration;
-import org.springframework.data.domain.Page;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import tech.joes.models.Movie;
-import tech.joes.repositories.MovieRepository;
+import tech.joes.services.MovieService;
 
 import java.util.Collection;
 import java.util.List;
+import java.util.Optional;
 
 @RestController
 @EnableAutoConfiguration
 public class MovieController {
 
     @Autowired
-    private MovieRepository repository;
+    private MovieService movieService;
 
     @RequestMapping(method = RequestMethod.GET, value = "/movies")
     @ResponseBody
     public ResponseEntity<Collection<Movie>> getAllMovies() {
 
-        Page<Movie> movies = (Page<Movie>) repository.findAll();
+        Collection<Movie> movies = movieService.getAllMovies();
 
-        return new ResponseEntity<>(movies.getContent(), HttpStatus.OK);
+        return new ResponseEntity<>(movies, HttpStatus.OK);
     }
 
     @RequestMapping(method = RequestMethod.GET, value = "/movies/{id}")
     @ResponseBody
     public ResponseEntity<Movie> getMovieWithId(@PathVariable String id) {
 
-        Movie movie = repository.findOne(id);
+        Optional<Movie> movie = movieService.getMovieWithId(id);
 
-        if (movie == null) {
-            return new ResponseEntity<>(HttpStatus.NOT_FOUND);
-        }
-
-        return new ResponseEntity<>(movie, HttpStatus.OK);
+        return getMovieResponseEntity(movie);
     }
+
 
     @RequestMapping(method = RequestMethod.GET, value = "/movies/releaseYear/{year}")
     @ResponseBody
-    public ResponseEntity<List<Movie>> getMoviesByReleaseYear(@PathVariable Integer year) {
+    public ResponseEntity<Collection<Movie>> getMoviesByReleaseYear(@PathVariable Integer year) {
 
-        List<Movie> movies = repository.findMoviesByReleaseYear(year);
+        List<Movie> movies = movieService.getMoviesByReleaseYear(year);
 
-        if (movies.size() == 0) {
-            return new ResponseEntity<>(HttpStatus.NOT_FOUND);
-        }
-
-        return new ResponseEntity<>(movies, HttpStatus.OK);
+        return getMovieListResponseEntity(movies);
     }
-
 
     @RequestMapping(method = RequestMethod.POST, value = "/movies")
     @ResponseBody
     public ResponseEntity addMovie(@RequestBody Movie input) {
-        return new ResponseEntity<>(repository.save(input), HttpStatus.CREATED);
+        return new ResponseEntity<>(movieService.addMovie(input), HttpStatus.CREATED);
     }
 
     @RequestMapping(method = RequestMethod.PUT, value = "/movies/{id}")
     @ResponseBody
     public ResponseEntity updateMovie(@PathVariable String id, @RequestBody Movie input) {
-        Movie movie = repository.findOne(id);
-
-        if (movie == null) {
-            return new ResponseEntity<>(HttpStatus.NOT_FOUND);
-        }
-
-        movie.setTitle(input.getTitle());
-        movie.setBlurb(input.getBlurb());
-        movie.setReleaseYear(input.getReleaseYear());
-        movie.setRuntime(input.getRuntime());
-
-        return new ResponseEntity<>(repository.save(movie), HttpStatus.OK);
+        Optional<Movie> movie = movieService.updateMovie(id, input);
+        return getMovieResponseEntity(movie);
     }
 
     @RequestMapping(method = RequestMethod.DELETE, value = "/movies/{id}")
     @ResponseBody
     public ResponseEntity deleteMovie(@PathVariable String id) {
-        Movie movie = repository.findOne(id);
 
-        if (movie == null) {
+        boolean deleted = movieService.deleteMovie(id);
+
+        if (!deleted) {
             return new ResponseEntity<>(HttpStatus.NOT_FOUND);
         }
-
-        repository.delete(movie);
 
         return new ResponseEntity<>(HttpStatus.NO_CONTENT);
     }
@@ -96,8 +77,21 @@ public class MovieController {
     @ResponseBody
     public ResponseEntity<Collection<Movie>> getMoviesByRuntimeIsBetween(@PathVariable Integer fromTime, @PathVariable Integer toTime) {
 
-        List<Movie> movies = repository.findMoviesByRuntimeIsBetween(fromTime, toTime);
+        Collection<Movie> movies = movieService.getMoviesByRuntimeIsBetween(fromTime, toTime);
 
+        return getMovieListResponseEntity(movies);
+    }
+
+    @RequestMapping(method = RequestMethod.GET, value = "/movies/title/blurb/contains/{keyword}")
+    @ResponseBody
+    public ResponseEntity<Collection<Movie>> getMoviesByTitleContainingOrBlurbContaining(@PathVariable String keyword) {
+
+        Collection<Movie> movies = movieService.getMoviesByTitleContainingOrBlurbContaining(keyword);
+
+        return getMovieListResponseEntity(movies);
+    }
+
+    private ResponseEntity<Collection<Movie>> getMovieListResponseEntity(Collection<Movie> movies) {
         if (movies.size() == 0) {
             return new ResponseEntity<>(HttpStatus.NOT_FOUND);
         }
@@ -105,16 +99,11 @@ public class MovieController {
         return new ResponseEntity<>(movies, HttpStatus.OK);
     }
 
-    @RequestMapping(method = RequestMethod.GET, value = "/movies/title/blurb/contains/{keyword}")
-    @ResponseBody
-    public ResponseEntity<Collection<Movie>> getMoviesByTitleContainingOrBlurbContaining(@PathVariable String keyword) {
-
-        List<Movie> movies = repository.findMoviesByTitleContainingOrBlurbContaining(keyword, keyword);
-
-        if (movies.size() == 0) {
+    private ResponseEntity<Movie> getMovieResponseEntity(Optional<Movie> movie) {
+        if (!movie.isPresent()) {
             return new ResponseEntity<>(HttpStatus.NOT_FOUND);
         }
 
-        return new ResponseEntity<>(movies, HttpStatus.OK);
+        return new ResponseEntity<>(movie.get(), HttpStatus.OK);
     }
 }
